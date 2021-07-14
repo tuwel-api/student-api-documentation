@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <title>Getting Started - Student TUWEL-API Docs</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Getting Started";
+    var mkdocs_page_input_path = "getting_started.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="icon icon-home"> Student TUWEL-API Docs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="index.html">Home</a>
+                    </li>
+                </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="getting_started.html">Getting Started</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#authentication">Authentication</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#calling-functions">Calling Functions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#clients">Clients</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#python">Python</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#javascript">JavaScript</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="functions.html">Curated Functions</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="all_functions.html">Function Documentation</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="notes.html">Additional Notes</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Student TUWEL-API Docs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Getting Started</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">#</a></h1>
+<h2 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">#</a></h2>
+<p>For authentication with the API you need a Moodle web service token, that authenticates your user with the web service.</p>
+<p>To that end, access the following URL in a browser:</p>
+<pre><code class="language-url">https://tuwel.tuwien.ac.at/admin/tool/mobile/launch.php?service=moodle_mobile_app&amp;passport=student_api
+</code></pre>
+<p>If you are presented with a login prompt, authenticate yourself as usual.</p>
+<p>There will be a (failed) attempt to redirect you to:</p>
+<pre><code class="language-html">moodlemobile://token=&lt;BASE64_ENCODED_TOKEN&gt;
+</code></pre>
+<p>You can access this string in the developer console of your browser. Decoding <code>&lt;BASE64_ENCODED_TOKEN&gt;</code> will result in a string of the form:</p>
+<pre><code class="language-html">&lt;PASSPORT_VALIDATION&gt;:::&lt;TOKEN&gt;[:::&lt;PRIVATE_TOKEN&gt;]
+</code></pre>
+<p>The second component (<code>&lt;TOKEN&gt;</code>) is the desired <strong>web service token</strong>.
+You can use this token until it expires (see <a href="notes.html">Token Expiration</a>).</p>
+<p>When using the provided Python client, you can pass the Base64 encoded string directly.</p>
+<h2 id="calling-functions">Calling Functions<a class="headerlink" href="#calling-functions" title="Permanent link">#</a></h2>
+<p>The API is a collection of so called web service functions.</p>
+<p>Call (via the browser, curl, or your programming language of choice):</p>
+<pre><code class="language-html">https://tuwel.tuwien.ac.at/moodle/webservice/rest/server.php?wstoken=&lt;TOKEN&gt;&amp;wsfunction=&lt;WS_FUNCTION&gt;&amp;moodlewsrestformat=json
+</code></pre>
+<p>where <code>&lt;TOKEN&gt;</code> refers to your web service token, and <code>&lt;WS_FUNCTION&gt;</code> is the name of the <code>WS_FUNCTION</code> you want to call. </p>
+<p>Function arguments can be appended to the call as GET-parameters. See the following example:</p>
+<pre><code class="language-html">...?wstoken=&lt;TOKEN&gt;&amp;wsfunction=mod_quiz_get_quizzes&amp;moodlewsrestformat=json&amp;courseids[0]=1&amp;courseids[1]=2
+</code></pre>
+<p>This would call the endpoint <code>mod_quiz_get_quizzes</code>, using <code>json</code>-format with the parameters <code>{courseids: [1,2]}</code>.</p>
+<p>Alternatively, you can do the same as a POST request, with parameters in the request body instead of the URL.</p>
+<p>This is of course not feasible for repeated use. We recommend to use one of the provided clients or to create your own.</p>
+<p>More Information: <a href="https://docs.moodle.org/dev/Creating_a_web_service_client">https://docs.moodle.org/dev/Creating_a_web_service_client</a></p>
+<p>Please find a <a href="functions.html">curated list of functions</a> and <a href="all_functions.html">detailed documentation</a>.</p>
+<h2 id="clients">Clients<a class="headerlink" href="#clients" title="Permanent link">#</a></h2>
+<p>We provide JavaScript and Python API-clients. Feel free to use them as a starting point &amp; extend/modify them to fit your needs.</p>
+<ul>
+<li>Python: <a href="https://github.com/tuwel-api/moodle-client-python">https://github.com/tuwel-api/moodle-client-python</a></li>
+<li>JavaScript: <a href="https://github.com/tuwel-api/moodle-client-javascript">https://github.com/tuwel-api/moodle-client-javascript</a></li>
+</ul>
+<h3 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">#</a></h3>
+<p>Both examples call mod_quiz_get_quizzes_by_courses with parameter <code>courseids=[]</code>, then print the response. 
+Find more detailed information in the respective repositories.</p>
+<h4 id="python">Python<a class="headerlink" href="#python" title="Permanent link">#</a></h4>
+<pre><code class="language-python">from moodle_client import MoodleClient
+
+token = 'YOUR_API_TOKEN'
+client = MoodleClient(token, 'https://tuwel.tuwien.ac.at')
+response = client.send('mod_quiz_get_quizzes_by_courses', {'courseids': []})
+print(response) 
+</code></pre>
+<h4 id="javascript">JavaScript<a class="headerlink" href="#javascript" title="Permanent link">#</a></h4>
+<pre><code class="language-javascript">const {MoodleRestClient} = require('./moodle-rest-client');
+const clientConfig = {
+    protocol: 'https',
+    port: '443',
+    subdirectory: ''
+}
+const token = 'YOUR_API_TOKEN'
+const client = new MoodleRestClient('tuwel.tuwien.ac.at', token, clientConfig)
+client.send('mod_quiz_get_quizzes', {courseids: []}).then(console.log)
+
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="functions.html" class="btn btn-neutral float-right" title="Curated Functions">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="index.html" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="functions.html" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

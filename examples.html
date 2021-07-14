@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <title>Examples - Student TUWEL-API Docs</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Examples";
+    var mkdocs_page_input_path = "examples.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="icon icon-home"> Student TUWEL-API Docs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="index.html">Home</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="functions.html">Curated Functions</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="all_functions.html">Function Documentation</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="notes.html">Additional Notes</a>
+                    </li>
+                </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="examples.html">Examples</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#todo-list-integration">ToDo-List-Integration</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#reading-grades">Reading Grades</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Student TUWEL-API Docs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Examples</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">#</a></h1>
+<h2 id="todo-list-integration">ToDo-List-Integration<a class="headerlink" href="#todo-list-integration" title="Permanent link">#</a></h2>
+<p>This example is assuming a db containing the following table: <code>activity (id INT PRIMARY KEY, name VARCHAR(255), duedate INT)</code></p>
+<p>Also the config file is expected to have the following structure:</p>
+<pre><code class="language-js">module.exports = {
+    ws_token: 'YOUR_API_TOKEN',
+    todoist_token: 'YOUR_TODOIST_TOKEN',
+    project_parent: 'PROJECT_NAME_FOR_TASKS', //e.g. 'TUWEL', 'UNI' needs to exist in todoist
+    clientUrl: 'tuwel.tuwien.ac.at',
+    clientConfig: {
+        protocol: 'https',
+        port: '443',
+        subdirectory: ''
+    }
+}
+</code></pre>
+<p>We want to add assignments, checkmarks and quizzes to todoist. But as we do not want to recreate tasks, we handle existence-checking
+with a sqlite db.</p>
+<pre><code class="language-js">
+const sqlite3 = require('sqlite3').verbose()
+const todoist = require('todoist-nodejs');
+
+const config = require('./config')
+const {
+    MoodleRestClient
+} = require('./moodle-rest-client')
+
+let db = new sqlite3.Database('./db/tuwel_tudo.db');
+
+
+sql_query_activity = &quot;SELECT id FROM activity;&quot;
+sql_insert_activity_template = &quot;INSERT INTO activity VALUES &quot;
+
+activities = []
+
+const api = new todoist(config.todoist_token);
+// id calculation beacuse each module has its own auto increment id, this is an easy way to ensure uniqueness for the db.
+async function assign_callback(course_data) {
+    course_data.assignments.forEach(ass =&gt; activities.push({
+        id: ass.id*10+1,
+        name: ass.name,
+        duedate: ass.duedate
+    }))
+}
+async function checkmark_callback(data) {
+    data.checkmarks.forEach(ch =&gt; activities.push({
+        id: ch.id*10+2,
+        name: ch.name,
+        duedate: ch.timedue
+    }))
+}
+async function quiz_callback(data) {
+    console.log(data)
+    data.quizzes.forEach(quiz =&gt; activities.push({
+        id: quiz.id*10+3,
+        name: quiz.name,
+        duedate: quiz.timeopen  
+    }))
+}
+async function get_tuwel_data() {
+    client = new MoodleRestClient(config.clientUrl, config.ws_token, config.clientConfig)
+
+    await client.send('mod_assign_get_assignments', {}).then(res =&gt; res.courses.forEach(assign_callback), console.log)
+    await client.send('mod_checkmark_get_checkmarks_by_courses', {}).then(checkmark_callback, console.log)
+    await client.send('mod_quiz_get_quizzes_by_courses', {}).then(quiz_callback, console.log)
+}
+
+function select(sql) {
+    return new Promise((resolve, reject) =&gt; {
+        const res = [];
+        db.each(sql, (err, row) =&gt; {
+            if (err) {
+                reject(err); // optional: you might choose to swallow errors.
+            } else {
+                res.push(row); // accumulate the data
+            }
+        }, (err, n) =&gt; {
+            if (err) {
+                reject(err); // optional: again, you might choose to swallow this error.
+            } else {
+                resolve(res); // resolve the promise
+            }
+        });
+    });
+}
+
+async function filter_out_old() {
+    let old_activity_ids;
+    await select(sql_query_activity).then(res =&gt; old_activity_ids = res.map(act =&gt; act.id), console.log)
+    console.log(old_activity_ids)
+    activities = activities.filter(act =&gt; old_activity_ids.indexOf(act.id) == -1)
+}
+
+async function add_todo_tasks() {
+    console.log(activities)
+    let parent_id;
+    await api.sync().then(res =&gt; parent_id = res.data.projects.find(project =&gt; project.name == config.project_parent).id);
+
+
+    activity_add_promises = activities.map(activity =&gt; api.items.add(activity.name, {
+        project_id: parent_id
+    }))
+    try { //there is some issue in the todoist module throwing an error, while still performing the commit.
+        await Promise.all(activity_add_promises)
+        await api.commit()
+    } catch {}
+}
+
+function store_new_tasks() {
+    if (activities.length &gt; 0) {
+        const placeholders = activities.map(act =&gt; `(${act.id},'${act.name}',${act.duedate})`).join(', ')
+        console.log(sql_insert_activity_template + placeholders)
+        db.run(sql_insert_activity_template + placeholders)
+    }
+}
+
+
+get_tuwel_data().then(filter_out_old).then(add_todo_tasks).then(store_new_tasks).then(() =&gt; db.close())
+</code></pre>
+<h2 id="reading-grades">Reading Grades<a class="headerlink" href="#reading-grades" title="Permanent link">#</a></h2>
+<p>For each course in progress, we create a pandas-dataframe representing the course-grades.</p>
+<pre><code class="language-python">import pandas as pd
+from moodle_client import MoodleClient
+
+token = 'YOUR_API_TOKEN'
+client = MoodleClient(token, 'https://moodle.melem.at')
+
+courses = client.send('core_course_get_enrolled_courses_by_timeline_classification', {'classification': 'inprogress'}).courses
+course_ids = [c.id for c in courses]
+
+course_grade_dfs = {}
+for course_id in course_ids:
+    gradeitems = client.send('gradereport_user_get_grade_items', {'courseid': course_id, 'userid': 4}).usergrades[0].gradeitems[:-1]
+    name = [i.itemname for i in gradeitems]
+    grade = [i.graderaw for i in gradeitems]
+    grademin = [i.grademin for i in gradeitems]
+    grademax = [i.grademax for i in gradeitems]
+    course_grade_df = pd.DataFrame({'name': name, 'grade': grade, 'grademin': grademin, 'grademax': grademax})
+    course_grade_dfs[course_id] = course_grade_df
+    print(course_grade_df)
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="notes.html" class="btn btn-neutral" title="Additional Notes"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="notes.html" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
