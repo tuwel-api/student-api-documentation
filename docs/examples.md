@@ -135,7 +135,7 @@ import pandas as pd
 from moodle_client import MoodleClient
 
 token = 'YOUR_API_TOKEN'
-client = MoodleClient(token, 'https://moodle.melem.at')
+client = MoodleClient(token, 'https://tuwel.tuwien.ac.at')
 
 courses = client.send('core_course_get_enrolled_courses_by_timeline_classification', {'classification': 'inprogress'}).courses
 course_ids = [c.id for c in courses]

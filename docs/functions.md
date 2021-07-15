@@ -1,10 +1,10 @@
 # Curated Functions
 
-See [Function Documentation](all_functions.md) for detailed information on how to call the various endpoints and what they return.
-
-
 There are many functions that are either inaccessible, or irrelevant to students. 
 Find the following list of features and their functions. It contains those we tried, and found to be potentially useful to students.
+
+See [Function Documentation](all_functions.md) for information on all functions.
+
 
 ** TODO: at the time of writing the functions of the first 5 features (the AMC plugins) are not implemented. At time of publishing update this accordingly. ** 
 
